@@ -1,9 +1,5 @@
 import numpy as np
 
-#initializing a page vector
-def init_pagevector(n):
-    return np.ones(n)/n
-
 """
     Calculates the total number of outgoing connections 
     a webpage has.
@@ -47,7 +43,12 @@ def transition_matrix(graph):
 
     for source in range(n):
         for destination in range(n):
-            if graph[source][destination] == 1:
+
+            # handles dangling webpages
+            if outgoing_connections[source] == 0:
+                M[destination][source] = 1 / n
+
+            elif graph[source][destination] == 1:
                 M[destination][source] = 1 / outgoing_connections[source]
 
     return M
@@ -70,6 +71,16 @@ def google_matrix(M):
 
     return G
 
+"""
+    Performs Gaussian elimination to reduce the given matrix to 
+    row-echelon form.
+
+    Args:
+        matrix: The matrix to be reduced.
+
+    Returns:
+        The row-echelon form of the matrix.
+"""
 def gauss_elim(matrix):
     A = matrix.astype(float).copy()
     rows,cols = A.shape
@@ -93,6 +104,16 @@ def gauss_elim(matrix):
             break
     return A
 
+"""
+    Solves for the eigenvector using Gaussian elimination
+    and back substitution.
+
+    Args:
+        matrix: The matrix representing the eigenvalue system.
+
+    Returns:
+        The eigenvector obtained after back substitution.
+"""
 def solve_eigenvec(matrix):
     A = gauss_elim(matrix)
     n = len(A)
@@ -106,56 +127,35 @@ def solve_eigenvec(matrix):
             x[i] = -sum/A[i][i]
     return x
 
+"""
+    Normalizes an eigenvector so that the sum of its elements is 1.
+
+    Args:
+        vec: The eigenvector to be normalized.
+
+    Returns:
+        The normalized eigenvector.
+"""
 def normalize(vec):
     total = np.sum(vec)
     if total == 0:
         return vec
     return vec/total
 
+"""
+    Calculates the PageRank vector by finding the eigenvector of 
+    the eigenvalue 1 of the Google matrix.
+
+    Args:
+        G: The Google matrix.
+
+    Returns:
+        The normalized PageRank vector.
+"""
 def calc_pagerank(G):
     n = len(G)
     A = G - np.eye(n) #G-I
 
     eigenvec = solve_eigenvec(A) #(G-I)r = 0
-    pagerank = normalize(eigenvec)#pagerank values should now add up to 1
+    pagerank = normalize(eigenvec) #pagerank values should now add up to 1
     return pagerank
-
-# for testing purposes only
-
-graph = np.array([
-    [0, 1, 1, 0, 0],
-    [0, 0, 1, 0, 0],
-    [1, 0, 0, 1, 0],
-    [1, 0, 0, 0, 1],
-    [0, 0, 1, 1, 0]
-])
-
-M = transition_matrix(graph)
-print("Transition Matrix : ")
-print(M)
-
-G = google_matrix(M)
-print("\nGoogle Matrix : ")
-print(G)
-
-A = G - np.eye(len(G)) #G-I
-print("\nG - I:")
-print(A)
-
-#Gaussian elimination
-A_reduced = gauss_elim(A)
-print("\nAfter Gaussian Elimination:")
-print(A_reduced)
-
-eigenvec = solve_eigenvec(A)
-
-print("\nEigenvector:")
-print(eigenvec)
-
-# Normalize
-pagerank = normalize(eigenvec)
-print("\nPageRank:")
-print(pagerank)
-
-print("\nSum of PageRank:")
-print(np.sum(pagerank))
