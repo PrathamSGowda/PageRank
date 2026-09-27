@@ -7,24 +7,10 @@ The main objective is to represent webpages as a directed graph, convert the gra
 
 We represent the above connection of graph as a matrix \(A\), which is defined as:
 
-$$
-A_{ij} =
-\begin{cases}
-1, & \text{if webpage } i \text{ has a link to webpage } j\\
-0, & \text{otherwise}
-\end{cases}
-$$
+![image](images/image1.png)
 
 For the above graph, the matrix is:
 
-$$
-A =
-\begin{bmatrix}
-0 & 1 & 1 & 0 \\
-0 & 0 & 1 & 0 \\
-1 & 0 & 0 & 1 \\
-0 & 0 & 0 & 0
-\end{bmatrix}
-$$
+![image](images/image2.png)
 
 Here, each row represents the source webpage and each column represents the destination webpage.
