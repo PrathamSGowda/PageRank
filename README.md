@@ -39,3 +39,29 @@ The transition matrix for our example graph is:
 ![image](images/image5.png)
 
 Here, each column represents the source webpage and each row represents the destination webpage.
+
+## Google Matrix
+The transition matrix assumes that the user always follows one of the available links. However, in the PageRank algorithm, a user can also randomly jump to any webpage.
+
+To model this, we introduce a **damping factor** \(d\) = 0.85.
+
+This means that:
+
+- 85% of the time the user follows a link.
+- 15% of the time the user randomly jumps to another webpage.
+
+The Google Matrix is defined as : 
+
+![image](images/image6.png)
+
+where:
+
+- \(G\) = Google matrix
+- \(M\) = transition matrix
+- \(d\) = damping factor
+- \(n\) = number of webpages
+- \(J\) = matrix containing only ones
+
+For our example : 
+
+![image](images/image7.png)
