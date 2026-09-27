@@ -65,3 +65,54 @@ where:
 For our example : 
 
 ![image](images/image7.png)
+
+## Finding the PageRank Vector
+
+The Google matrix represents the probabilities of moving between webpages. We now want to find a vector \(r\) that represents the PageRank of each webpage:
+
+
+![image](images/image8.png)
+
+To find the PageRank values, we look for a vector \(r\) that remains unchanged after applying the Google matrix:
+
+![image](images/image9.png)
+
+Here, \(Gr\) represents the **new PageRank vector** obtained after applying the transition probabilities in the Google matrix to the current PageRank vector \(r\).
+
+The equation \(Gr=r\) means that the new PageRank values are exactly the same as the original values. Therefore, the PageRank distribution has reached a **stable state**.
+
+Comparing this with the general eigenvalue equation:
+
+![image](images/image10.png)
+
+we can see that the PageRank vector \(r\) is an **eigenvector of the Google matrix \(G\)** corresponding to the eigenvalue 1.
+
+## Finding the Eigenvector
+
+We need to find the eigenvector corresponding to the eigenvalue, this can be done by solving the equation:
+
+![image](images/image11.png)
+
+In this project, we find the eigenvector using **Gaussian elimination and back substitution**.
+The resulting eigenvector gives the **relative PageRank values** of the webpages.
+After finding the eigenvector, we normalize it so that all PageRank values add up to 1.
+
+## Normalizing the PageRank Vector
+
+The eigenvector gives us the **relative importance** of each webpage. To obtain the final PageRank values, we normalize the eigenvector so that all values add up to 1.
+
+We find the sum of all elements in the vector and then divide each element by that sum to get the normalized vector and the final PageRank values.
+
+## Conclusion
+
+We get the final PageRank vector as:
+
+![image](images/image12.png)
+
+A higher PageRank value means that the webpage has a higher probability of being visited by a user following the probabilities represented by the Google matrix.
+
+In our example, webpage C has the highest PageRank value. Therefore, based on this PageRank calculation, **C would have the highest ranking among the four webpages**.
+
+Webpages A and D have equal PageRank values, while B has the lowest PageRank value.
+
+Thus, the PageRank algorithm shows how the structure of links between webpages can be represented using matrices and used to determine their relative ranking.
