@@ -1,4 +1,6 @@
 # Matrix Eigenvalues and Google's PageRank Algorithm
+During 1990-1997, earlier search engines failed because they simply counted the number of keywords which made results easy to manipulate. Google revolutionized searching by introducing the PageRank Algorithm, a mathematical formula developed by Larry Page and Sergey Brin that ranks the importance of webpages by treating hyperlinks as votes of confidence. Instead of analyzing text alone, it evaluates the entire structural network of the web, giving more weight to links coming from highly trusted, authoritative websites.
+
 This project implements the **PageRank algorithm** using concepts from **matrix algebra, eigenvalues, and eigenvectors**.
 The main objective is to represent webpages as a directed graph, convert the graph into matrices, and use matrix algebra to calculate the importance of each webpage.
 
