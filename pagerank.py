@@ -114,19 +114,23 @@ def gauss_elim(matrix):
     Returns:
         The eigenvector obtained after back substitution.
 """
+
 def solve_eigenvec(matrix):
     A = gauss_elim(matrix)
     n = len(A)
     x = np.zeros(n)
     x[n-1] = 1
-    for i in range(n- 2, -1,-1): # Back Substitution
-        sum = 0
-        for j in range(i+1,n):
-            sum += A[i][j] * x[j]
-        if abs(A[i][j])>1e-12:
-            x[i] = -sum/A[i][i]
-    return x
 
+    for i in range(n - 2, -1, -1):  
+        sum = 0
+
+        for j in range(i + 1, n):
+            sum += A[i][j] * x[j]
+
+        if abs(A[i][i]) > 1e-12:
+            x[i] = -sum / A[i][i]
+
+    return x
 """
     Normalizes an eigenvector so that the sum of its elements is 1.
 
