@@ -47,9 +47,12 @@ button:focus-visible, select:focus-visible { outline: 2px solid var(--accent); o
 /* SVG graph */
 .node circle { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2; transition: r .3s; }
 .node text { text-anchor: middle; dominant-baseline: central; font-weight: 600; fill: var(--ink); pointer-events: none; }
-.node { animation: pop .25s ease-out; }
+.node { animation: pop .25s ease-out; cursor: pointer; }
+.node.selected circle { fill: #cfe0f6; stroke-width: 4; }
 @keyframes pop { from { opacity: 0; } to { opacity: 1; } }
 .edge { stroke: var(--muted); stroke-width: 1.6; fill: none; marker-end: url(#arrow); }
+.edge-hit { stroke: transparent; stroke-width: 14; fill: none; cursor: pointer; pointer-events: stroke; }
+.edge-wrap:hover .edge { stroke: var(--error); }
 
 /* Pipeline */
 .pipeline { display: flex; flex-wrap: wrap; gap: .5rem; list-style: none; margin: 0; padding: 0; }

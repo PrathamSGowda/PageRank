@@ -7,6 +7,7 @@ let graph = [];
 let nextId = 0;          // used to generate new page names
 let result = null;       // last response from Flask (null when graph changed since)
 let activeTab = "adjacency";
+let selected = null;     // index of the node chosen as link source (null = none)
 
 const $ = (id) => document.getElementById(id);
 const SVG_NS = "http://www.w3.org/2000/svg";
@@ -18,6 +19,7 @@ function makeLabel(i) {
 
 function resetGraph() {
   labels = []; graph = []; nextId = 0; result = null;
+  selected = null;
   for (let i = 0; i < 4; i++) addPage(true);
   // small starting example: A->B, A->C, B->C, C->A, D->C
   [[0, 1], [0, 2], [1, 2], [2, 0], [3, 2]].forEach(([s, d]) => (graph[s][d] = 1));
@@ -44,12 +46,32 @@ function removePage() {
   showMessage("");
 }
 
-function addLink() { changeLink(1); }
-function removeLink() { changeLink(0); }
+// Node click: first click = source, second click = destination (order sets direction)
+function selectNode(i) {
+  if (selected === null) {
+    selected = i;
+    updateSelection();
+    return showMessage(`Source ${labels[i]} selected. Now click the destination page.`);
+  }
+  const from = selected;
+  selected = null;
+  changeLink(1, from, i);
+  updateSelection();   // clears the highlight (also needed when changeLink only shows an error)
+}
 
-function changeLink(value) {
-  const from = Number($("fromSelect").value);
-  const to = Number($("toSelect").value);
+// Clicking an edge in the graph removes that link
+function removeEdge(from, to) {
+  graph[from][to] = 0;
+  result = null;
+  refresh();
+  showMessage(`Removed link ${labels[from]} \u2192 ${labels[to]}.`);
+}
+
+function updateSelection() {
+  [...$("nodes").children].forEach((g, i) => g.classList.toggle("selected", i === selected));
+}
+
+function changeLink(value, from, to) {
   if (labels.length === 0 || Number.isNaN(from) || Number.isNaN(to)) return showMessage("Add pages first.", true);
   if (from === to) return showMessage("A page cannot link to itself here. Pick two different pages.", true);
   if (graph[from][to] === value) {
@@ -76,8 +98,7 @@ function fillSelect(select, keepIndex) {
 }
 
 function refresh() {
-  fillSelect($("fromSelect"), 0);
-  fillSelect($("toSelect"), 1);
+  selected = null;
   fillSelect($("removePageSelect"), 0);
   drawGraph();
   if (!result) $("results").hidden = true;
@@ -115,10 +136,21 @@ function drawGraph() {
       // Start/end on the circle borders (aim toward the control point)
       const start = edgePoint(a, { x: mx, y: my }, radiusOf(s));
       const end = edgePoint(b, { x: mx, y: my }, radiusOf(d) + 2);
+      const d_attr = `M${start.x},${start.y} Q${mx},${my} ${end.x},${end.y}`;
+      const wrap = document.createElementNS(SVG_NS, "g");
+      wrap.setAttribute("class", "edge-wrap");
       const path = document.createElementNS(SVG_NS, "path");
       path.setAttribute("class", "edge");
-      path.setAttribute("d", `M${start.x},${start.y} Q${mx},${my} ${end.x},${end.y}`);
-      edges.appendChild(path);
+      path.setAttribute("d", d_attr);
+      // wider invisible path so the thin line is easy to click
+      const hit = document.createElementNS(SVG_NS, "path");
+      hit.setAttribute("class", "edge-hit");
+      hit.setAttribute("d", d_attr);
+      hit.innerHTML = `<title>Click to remove ${labels[s]} \u2192 ${labels[d]}</title>`;
+      hit.addEventListener("click", () => removeEdge(s, d));
+      wrap.appendChild(path);
+      wrap.appendChild(hit);
+      edges.appendChild(wrap);
     }
   }
 
@@ -127,8 +159,10 @@ function drawGraph() {
     g.setAttribute("class", "node");
     g.innerHTML = `<circle cx="${pos[i].x}" cy="${pos[i].y}" r="${radiusOf(i)}"></circle>
                    <text x="${pos[i].x}" y="${pos[i].y}">${label}</text>`;
+    g.addEventListener("click", () => selectNode(i));
     nodes.appendChild(g);
   });
+  updateSelection();
 }
 
 // Point on the circle around `center` in the direction of `toward`
@@ -219,8 +253,6 @@ document.querySelectorAll(".tab").forEach((btn) =>
 );
 $("addPage").addEventListener("click", () => addPage(false));
 $("removePage").addEventListener("click", removePage);
-$("addLink").addEventListener("click", addLink);
-$("removeLink").addEventListener("click", removeLink);
 $("calculate").addEventListener("click", calculate);
 $("reset").addEventListener("click", resetGraph);
 
