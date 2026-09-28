@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PageRank Simulator</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="site-header">
+    <h1>PageRank Simulator</h1>
+    <p>Visualize how PageRank evaluates the importance of pages in a directed graph.</p>
+  </header>
+
+  <main>
+    <!-- Graph editor -->
+    <section class="card" id="editor">
+      <h2>Graph editor</h2>
+      <div class="editor-grid">
+        <svg id="graph" viewBox="0 0 600 420" role="img" aria-label="Directed graph of pages">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="#5b6b86"/>
+            </marker>
+          </defs>
+          <g id="edges"></g>
+          <g id="nodes"></g>
+        </svg>
+
+        <div class="controls">
+          <div class="control-group">
+            <h3>Pages</h3>
+            <div class="row">
+              <button id="addPage" type="button">Add page</button>
+              <select id="removePageSelect" aria-label="Page to remove"></select>
+              <button id="removePage" type="button" class="secondary">Remove</button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <h3>Links</h3>
+            <div class="row">
+              <label>From <select id="fromSelect"></select></label>
+              <label>To <select id="toSelect"></select></label>
+            </div>
+            <div class="row">
+              <button id="addLink" type="button">Add link</button>
+              <button id="removeLink" type="button" class="secondary">Remove link</button>
+            </div>
+          </div>
+
+          <p id="message" class="message" role="status"></p>
+
+          <div class="row">
+            <button id="calculate" type="button" class="primary">Calculate PageRank</button>
+            <button id="reset" type="button" class="secondary">Reset graph</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results (hidden until calculated) -->
+    <div id="results" hidden>
+      <section class="card">
+        <h2>From graph to PageRank</h2>
+        <ol class="pipeline">
+          <li>Graph</li>
+          <li>Adjacency matrix</li>
+          <li>Transition matrix</li>
+          <li>Google matrix</li>
+          <li>PageRank vector</li>
+        </ol>
+      </section>
+
+      <section class="card">
+        <h2>Matrices</h2>
+        <div class="tabs" role="tablist">
+          <button class="tab active" data-tab="adjacency" role="tab">Adjacency</button>
+          <button class="tab" data-tab="transition" role="tab">Transition</button>
+          <button class="tab" data-tab="google" role="tab">Google</button>
+        </div>
+        <p id="matrixNote" class="note"></p>
+        <div id="matrixWrap" class="table-wrap"></div>
+      </section>
+
+      <section class="card">
+        <h2>PageRank results</h2>
+        <div class="table-wrap">
+          <table class="results-table">
+            <thead><tr><th>Rank</th><th>Page</th><th>PageRank</th><th>Percentage</th><th></th></tr></thead>
+            <tbody id="resultsBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- Explanation -->
+    <section class="card explain">
+      <h2>How it works</h2>
+      <h3>1. Adjacency matrix</h3>
+      <p>Shows which pages link to which. Rows are source pages and columns are destination pages: <code>graph[source][destination] = 1</code> means the source links to the destination.</p>
+      <h3>2. Transition matrix</h3>
+      <p>Turns outgoing links into probabilities. A page with <em>k</em> outgoing links gives each destination a probability of 1/<em>k</em>. Columns are sources and rows are destinations, so every column sums to 1. A dangling page (no outgoing links) spreads its probability equally over all pages, 1/<em>n</em>.</p>
+      <h3>3. Google matrix</h3>
+      <p>Adds random jumps with damping factor <em>d</em> = 0.85: <code>G = dM + ((1−d)/n)J</code>, where <em>J</em> is the all-ones matrix.</p>
+      <h3>4. PageRank</h3>
+      <p>PageRank is the eigenvector of <em>G</em> for eigenvalue 1, found by solving <code>(G − I)r = 0</code> with Gaussian elimination and back substitution, then normalizing so the values sum to 1.</p>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
