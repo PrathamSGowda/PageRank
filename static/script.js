@@ -1,4 +1,5 @@
 // PageRank Simulator - frontend only handles the UI. All maths happens in Python (/calculate).
+
 // ---------- Graph state ----------
 // graph[source][destination] = 1 means "source links to destination"
 let labels = [];
@@ -20,7 +21,7 @@ function resetGraph() {
   labels = []; graph = []; nextId = 0; result = null;
   selected = null;
   for (let i = 0; i < 4; i++) addPage(true);
-  // default example: A->B, A->C, B->C, C->A, D->C
+  // small starting example: A->B, A->C, B->C, C->A, D->C
   [[0, 1], [0, 2], [1, 2], [2, 0], [3, 2]].forEach(([s, d]) => (graph[s][d] = 1));
   $("results").hidden = true;
   refresh();
@@ -28,7 +29,10 @@ function resetGraph() {
 }
 
 function addPage(silent) {
-  labels.push(makeLabel(nextId++));
+  // use the first label not currently in use, so labels restart at A after deletions
+  let id = 0;
+  while (labels.includes(makeLabel(id))) id++;
+  labels.push(makeLabel(id));
   graph.forEach((row) => row.push(0));
   graph.push(new Array(labels.length).fill(0));
   if (!silent) { result = null; refresh(); showMessage(""); }
@@ -207,23 +211,27 @@ function renderMatrix() {
   const sourceIsRow = activeTab === "adjacency";
   $("matrixNote").textContent = NOTES[activeTab];
 
+  // Drawn as a bracketed matrix on a CSS grid. Columns: row label | [ | values | ] | links out
   // Headers make the orientation explicit
-  const colHead = labels.map((l) => `<th>${sourceIsRow ? "to " : "from "}${l}</th>`).join("");
-  let html = `<table><thead><tr><th></th>${colHead}`;
-  if (sourceIsRow) html += `<th>links out</th>`;
-  html += `</tr></thead><tbody>`;
+  const n = m.length;
+  const put = (r, c, content, cls) => `<div class="${cls}" style="grid-row:${r};grid-column:${c}">${content}</div>`;
+  let html = `<div class="matrix" style="grid-template-columns:auto 10px repeat(${n}, auto) 10px${sourceIsRow ? " auto" : ""}">`;
+  labels.forEach((l, c) => (html += put(1, 3 + c, `${sourceIsRow ? "to " : "from "}${l}`, "mx-head")));
+  if (sourceIsRow) html += put(1, n + 4, "links out", "mx-head");
   m.forEach((row, r) => {
-    const rowHead = `${sourceIsRow ? "from " : "to "}${labels[r]}`;
-    html += `<tr><th>${rowHead}</th>${row.map((v) => `<td>${v.toFixed(digits)}</td>`).join("")}`;
-    if (sourceIsRow) html += `<td>${result.outgoing[r]}</td>`;
-    html += `</tr>`;
+    html += put(r + 2, 1, `${sourceIsRow ? "from " : "to "}${labels[r]}`, "mx-head mx-row");
+    row.forEach((v, c) => (html += put(r + 2, 3 + c, v.toFixed(digits), "mx-cell")));
+    if (sourceIsRow) html += put(r + 2, n + 4, result.outgoing[r], "mx-cell mx-out");
   });
+  html += `<div class="mx-bracket left" style="grid-row:2 / span ${n};grid-column:2"></div>`;
+  html += `<div class="mx-bracket right" style="grid-row:2 / span ${n};grid-column:${n + 3}"></div>`;
   if (!sourceIsRow) {
     // column sums, to show that each column is a probability distribution
     const sums = labels.map((_, c) => m.reduce((acc, row) => acc + row[c], 0));
-    html += `<tr><th>column sum</th>${sums.map((s) => `<td>${s.toFixed(4)}</td>`).join("")}</tr>`;
+    html += put(n + 2, 1, "column sum", "mx-head mx-row mx-sum");
+    sums.forEach((s, c) => (html += put(n + 2, 3 + c, s.toFixed(4), "mx-cell mx-sum")));
   }
-  $("matrixWrap").innerHTML = html + `</tbody></table>`;
+  $("matrixWrap").innerHTML = html + `</div>`;
 }
 
 // ---------- PageRank table ----------
