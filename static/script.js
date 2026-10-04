@@ -1,5 +1,4 @@
 // PageRank Simulator - frontend only handles the UI. All maths happens in Python (/calculate).
-
 // ---------- Graph state ----------
 // graph[source][destination] = 1 means "source links to destination"
 let labels = [];
@@ -21,7 +20,7 @@ function resetGraph() {
   labels = []; graph = []; nextId = 0; result = null;
   selected = null;
   for (let i = 0; i < 4; i++) addPage(true);
-  // small starting example: A->B, A->C, B->C, C->A, D->C
+  // default example: A->B, A->C, B->C, C->A, D->C
   [[0, 1], [0, 2], [1, 2], [2, 0], [3, 2]].forEach(([s, d]) => (graph[s][d] = 1));
   $("results").hidden = true;
   refresh();
