@@ -58,28 +58,6 @@
     <!-- Results (hidden until calculated) -->
     <div id="results" hidden>
       <section class="card">
-        <h2>From graph to PageRank</h2>
-        <ol class="pipeline">
-          <li>Graph</li>
-          <li>Adjacency matrix</li>
-          <li>Transition matrix</li>
-          <li>Google matrix</li>
-          <li>PageRank vector</li>
-        </ol>
-      </section>
-
-      <section class="card">
-        <h2>Matrices</h2>
-        <div class="tabs" role="tablist">
-          <button class="tab active" data-tab="adjacency" role="tab">Adjacency</button>
-          <button class="tab" data-tab="transition" role="tab">Transition</button>
-          <button class="tab" data-tab="google" role="tab">Google</button>
-        </div>
-        <p id="matrixNote" class="note"></p>
-        <div id="matrixWrap" class="table-wrap"></div>
-      </section>
-
-      <section class="card">
         <h2>PageRank results</h2>
         <div class="table-wrap">
           <table class="results-table">
@@ -95,6 +73,17 @@
             <tbody id="resultsBody"></tbody>
           </table>
         </div>
+      </section>
+
+      <section class="card">
+        <h2>Matrices</h2>
+        <div class="tabs" role="tablist">
+          <button class="tab active" data-tab="adjacency" role="tab">Adjacency</button>
+          <button class="tab" data-tab="transition" role="tab">Transition</button>
+          <button class="tab" data-tab="google" role="tab">Google</button>
+        </div>
+        <p id="matrixNote" class="note"></p>
+        <div id="matrixWrap" class="table-wrap"></div>
       </section>
     </div>
   </main>

@@ -230,11 +230,14 @@ function renderMatrix() {
 // ---------- PageRank table ----------
 function renderResults() {
   const max = Math.max(...result.pagerank);
+  let shownRank = 0;
   $("resultsBody").innerHTML = result.order.map((idx, position) => {
     const value = result.pagerank[idx];
     const width = max > 0 ? (value / max) * 100 : 0;
+    // tied pages share a rank number (tiny tolerance absorbs floating-point noise); sorting is unchanged
+    if (position === 0 || Math.abs(value - result.pagerank[result.order[position - 1]]) > 1e-9) shownRank = position + 1;
     return `<tr>
-      <td>${position + 1}</td>
+      <td>${shownRank}</td>
       <td>${labels[idx]}</td>
       <td>${value.toFixed(4)}</td>
       <td>${(value * 100).toFixed(2)}%</td>
